@@ -43,23 +43,31 @@ router.post("/", (req, res) => {
               return res.status(400).send(`Invalid testsuite: ${testsuite}`);
             }
 
-            testcases = files.filter(file => file.endsWith(config.inExt));
-            results = [];
+            const testcases = files.filter(file => file.endsWith(config.inExt));
+            const results = [];
 
             const finish = () => {
+              box.destroy();
               res.send(results);
             }
             const runTest = () => {
               let i = results.length;
 
               if(i === testcases.length) return finish();
+              
+              const name = testcases[i].substring(0, testcases[i].length - config.inExt.length);
 
               if(grader) {
-                const outputFile = testcases[i].substring(0, testcases[i].length - config.inExt.length) + config.outExt;
+                const outputFile = name + config.outExt;
 
-                box.runGrader(`${testsuiteDir}/${testcases[i]}`, `${testsuiteDir}/${outputFile}`, getGraderDir(grader), {}, (err, resp) => {
-                  if(err) return res.status(500).send(err);
-                  res.send(resp);
+                box.runGrader(`${testsuiteDir}/${testcases[i]}`, `${testsuiteDir}/${outputFile}`, getGraderDir(grader), {}, (err, result) => {
+                  results.push({
+                    name,
+                    result,
+                    err
+                  });
+
+                  runTest();
                 })
               } else {
                 const inputFileName = "data.in";
@@ -68,6 +76,7 @@ router.post("/", (req, res) => {
 
                   box.run(inputFileName, {}, (err, stdout, stderr) => {
                     results.push({
+                      name,
                       err,
                       stdout,
                       stderr

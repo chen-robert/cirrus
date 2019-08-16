@@ -30,6 +30,8 @@ class Isolate {
     } else {
       boxId = cache.pop();
     }
+
+    this.boxId = boxId;
     if(TESTING) {
       this.rootPath = `${__rootdir}/tmp/${boxId}`
       fs.mkdirSync(this.rootPath, { recursive: true });
@@ -115,6 +117,10 @@ class Isolate {
       }
       return cb(null, stdout);
     });
+  }
+
+  destroy() {
+    cache.push(this.boxId);
   }
 
 

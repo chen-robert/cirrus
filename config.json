@@ -9,5 +9,6 @@
     }
   },
   "inExt": ".in",
-  "outExt": ".out"
+  "outExt": ".out",
+  "graders": ["default"]
 }

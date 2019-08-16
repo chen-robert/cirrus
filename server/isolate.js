@@ -3,7 +3,7 @@ const config = require(__rootdir + "/config.json");
 const fs = require("fs");
 const path = require("path");
 
-const { exec, execSync } = require('child_process');
+const { exec, execSync, spawn } = require('child_process');
 
 const TESTING = process.env.TESTING !== undefined;
 
@@ -72,6 +72,49 @@ class Isolate {
     }
 
     exec(cmd, cb);
+  }
+
+  runCmd(opts) {
+    let cmd = "";
+    if(!TESTING) {
+      cmd = `${isolateCmd} -e --run --`;
+    }
+
+    if(this.config.run) {
+      
+    } else {
+      cmd = `${cmd} ${TESTING? this.rootPath + "/" : ""}${this.config.out}`;
+    }
+
+    return cmd;
+  }
+
+  runGrader(inFile, outFile, graderDir, opts, cb) {
+    const graderConfig = require(`${graderDir}/config.json`);
+    const {cmd, args} = graderConfig;
+
+    const grader = spawn(cmd, args, {
+      cwd: graderDir,
+      env: {
+        "INPUT_PATH": inFile,
+        "ANSWER_PATH": outFile,
+        "RUN_CMD": this.runCmd(opts)
+      }
+    });
+
+    let stdout = "";
+    let stderr = "";
+    grader.stdout.on("data", data => stdout += data);
+    grader.stderr.on("data", data => stderr += data);
+
+    grader.on("close", code => {
+      if(code != 0) {
+        console.log(`Grader exited with error code: ${code}`);
+        console.log(`Stderr: ${stderr}`);
+        return cb(`Grader exited with code ${code}`);
+      }
+      return cb(null, stdout);
+    });
   }
 
 

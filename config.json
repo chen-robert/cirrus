@@ -1,0 +1,11 @@
+{
+  "langs": {
+    "c": {
+      "compile": {
+        "cmd": "gcc",
+        "opts": ["-std=c11", "-Wall", "-Wextra", "-O2", "-lm", "-o", "a.o"]
+      },
+      "out": "a.o"
+    }
+  }
+}

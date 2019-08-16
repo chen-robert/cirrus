@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -e js,json --watch index.js --watch server index.js"
   },
   "repository": {
     "type": "git",
@@ -17,5 +18,8 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "multer": "^1.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
   }
 }

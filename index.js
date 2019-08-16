@@ -73,5 +73,7 @@ app.post("/upload",
   }
 );
 
+app.use("/run", require(__rootdir + "/server/run.js"));
+
 
 app.listen(PORT, () => console.log(`Started server at port ${PORT}`));

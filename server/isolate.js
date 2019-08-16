@@ -59,7 +59,7 @@ class Isolate {
     exec(cmd, cb);
   }
 
-  run(opts, cb) {
+  run(inFile, opts, cb) {
     let cmd = "";
     if(!TESTING) {
       cmd = `${isolateCmd} -e --run --`;

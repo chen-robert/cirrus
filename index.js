@@ -66,7 +66,7 @@ app.post("/upload",
         return res.status(400).send("Invalid parameters");
       }
 
-      fs.rename(file.path, `${uploadPath}/${group}/${name}`);
+      fs.rename(file.path, getPath(group, name));
 
       return res.status(200);
     });

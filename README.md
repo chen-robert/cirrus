@@ -96,6 +96,14 @@ An array of strings representing the valid graders.
 | compile | Isolate options for compiling | No |
 | execute | Isolate options for running | No |
 
+##### Isolate Options
+
+| Name | Meaning | Required |
+| --- | --- | --- |
+| time | The maximum runtime of the program | No |
+| wallTime | The maximum walltime. This clock does not stop when the program has lost the CPU or when it is waiting for an external event | No |
+| mem | The maximum memory used by the program | No |
+
 ```json
 {
   "lang": "c",
@@ -112,14 +120,6 @@ An array of strings representing the valid graders.
   "testsuite": "global"
 }
 ```
-
-##### Isolate Options
-
-| Name | Meaning | Required |
-| --- | --- | --- |
-| time | The maximum runtime of the program | No |
-| wallTime | The maximum walltime. This clock does not stop when the program has lost the CPU or when it is waiting for an external event | No |
-| mem | The maximum memory used by the program | No |
 
 #### Returns
 

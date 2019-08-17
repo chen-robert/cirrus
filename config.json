@@ -19,6 +19,18 @@
         "opts": ["-classpath", "$ROOTPATH", "$NAME"]
       },
       "out": "$NAME.class"
+    },
+    "python3": {
+      "run": {
+        "cmd": "python3",
+        "opts": ["$OUTFILE"]
+      }
+    },
+    "python2": {
+      "run": {
+        "cmd": "python",
+        "opts": ["$OUTFILE"]
+      }
     }
   },
   "inExt": ".in",

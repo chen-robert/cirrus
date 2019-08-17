@@ -50,7 +50,20 @@ config.graders.forEach(grader => {
   }
 });
 
-console.log(`Using graders: ${JSON.stringify(config.graders)}`)
+console.log(`Using graders: ${JSON.stringify(config.graders)}`);
+
+const memo = {};
+const which = binary => {
+  if(memo[binary]) return memo[binary];
+
+  const dirs = process.env.PATH.split(":");
+
+  memo[binary] = dirs
+    .map(dir => `${dir}/${binary}`)
+    .filter(dir => fs.existsSync(dir))[0] || binary;
+
+  return memo[binary];
+}
 
 class Isolate {
   static get langs() {
@@ -117,7 +130,9 @@ class Isolate {
       this.compiledFile = source;
       return cb();
     }
-    this.compiledFile = this.config.out; 
+    
+    this.name = source.split(".")[0];
+    this.compiledFile = this.parseSpecial(this.config.out); 
 
     opts = Object.assign(compileDefaults, opts);
     let cmd = this.getCommandBase(opts);
@@ -128,10 +143,21 @@ class Isolate {
     exec(cmd, cb);
   }
 
+  parseSpecial(name) {
+    return name
+      .replace(/\$NAME/g, this.name)
+      .replace(/\$OUTFILE/g, (TESTING ? this.rootPath: "") + "/" + this.compiledFile)
+      .replace(/\$ROOTPATH/g, TESTING? this.rootPath: "/box");
+  }
+
   getFullCmd(config) {
     const {cmd, opts} = config;
 
-    return `${cmd} ${opts.join(" ")}`;
+    let ret = which(this.parseSpecial(cmd));
+
+    if(opts) ret = `${ret} ${opts.map(name => this.parseSpecial(name)).join(" ")}`;
+
+    return ret;
   }
 
   run(inFile, opts, cb) {
@@ -150,8 +176,6 @@ class Isolate {
       cmd = `${cmd} ${this.getFullCmd(this.config.run)}`;
     }
     
-    cmd = `${cmd} ${TESTING? this.rootPath + "/" : ""}${this.compiledFile}`;
-
     return cmd;
   }
 

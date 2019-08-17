@@ -5,7 +5,20 @@
         "cmd": "gcc",
         "opts": ["-std=c11", "-Wall", "-Wextra", "-O3", "-lm", "-o", "a.o"]
       },
+      "run": {
+        "cmd": "$OUTFILE"
+      },
       "out": "a.o"
+    },
+    "java": {
+      "compile": {
+        "cmd": "javac"
+      },
+      "run": {
+        "cmd": "java",
+        "opts": ["-classpath", "$ROOTPATH", "$NAME"]
+      },
+      "out": "$NAME.class"
     }
   },
   "inExt": ".in",

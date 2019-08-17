@@ -43,6 +43,7 @@ router.post("/", (req, res) => {
             const outputFile = `${testsuiteDir}/${name + config.outExt}`;
             if(grader) {
               box.runGrader(inputFile, outputFile, grader, {}, (err, status) => {
+                status = status.trim();
                 resolve({
                   name,
                   status,

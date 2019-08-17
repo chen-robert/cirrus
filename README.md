@@ -6,9 +6,15 @@ Built on top of the [isolate](https://github.com/ioi/isolate) sandbox for secure
 
 ## Benefits
 
-- Lightweight. Problem data is cached to avoid overhead.
-- Simple. Convention over configuration. Sane defaults are chosen - it's useable out of the box.
+- Lightweight. Problem data is cached to avoid any overhead.
+- Simple. Convention over configuration. Sane defaults are chosen - usable out of the box.
 - Customizable. Dynamic grading through an easy to use interface.
+
+## Problem Data
+
+Problem data in seperated into input and output files, with their corresponding extensions `config.inExt` and `config.outExt`. Input files represent the input data for a given problem, while output files represent the **expected** output.
+
+Each input file should have a corresponding output file. For example, `name.in` would correspond to `name.out`. Similarly, `1.in` would correspond to `1.out`. Conventionally, test case names start from 0 and increment upwards.
 
 ## Graders
 

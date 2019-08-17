@@ -3,15 +3,15 @@
     "c": {
       "compile": {
         "cmd": "gcc",
-        "opts": ["-std=c11", "-Wall", "-Wextra", "-O2", "-lm", "-o", "a.o"]
+        "opts": ["-std=c11", "-Wall", "-Wextra", "-O3", "-lm", "-o", "a.o"]
       },
       "out": "a.o"
     }
   },
   "inExt": ".in",
   "outExt": ".out",
-  "graders": ["default"],
   "testsDir": "uploads/tests",
   "graderDir": "graders",
+  "graders": ["default", "strict"],
   "runTestsAsync": false
 }

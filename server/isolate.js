@@ -34,6 +34,11 @@ const optToFlag = {
   inFile: "--stdin",
 }
 
+config.graders.forEach(grader => {
+  const config = require(`${getGraderDir(grader)}/config.json`);
+  execSync(`cd ${getGraderDir(grader)} && ${config.prepare}`);
+})
+
 class Isolate {
   static get langs() {
     return Object.keys(config.langs);
@@ -151,8 +156,6 @@ class Isolate {
         "RUN_CMD": this.runCmd(opts)
       }
     });
-
-    console.log(inFile, outFile, this.runCmd(opts));
 
     let stdout = "";
     let stderr = "";

@@ -23,5 +23,6 @@ app.use("/run", require(__rootdir + "/server/run.js"));
 app.get("/langs", (req, res) => res.send(config.langs));
 app.get("/graders", (req, res) => res.send(config.graders));
 
-
 app.listen(PORT, () => console.log(`Started server at port ${PORT}`));
+
+module.exports = app;

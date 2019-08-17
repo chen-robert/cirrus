@@ -35,9 +35,20 @@ const optToFlag = {
 }
 
 config.graders.forEach(grader => {
-  const config = require(`${getGraderDir(grader)}/config.json`);
-  execSync(`cd ${getGraderDir(grader)} && ${config.prepare}`);
-})
+  const graderDir = getGraderDir(grader);
+  const config = require(`${graderDir}/config.json`);
+
+  try{
+    execSync(config.prepare, {
+      cwd: graderDir
+    });
+  } catch (e) {
+    console.error(`Failed to prepare grader in ${graderDir}`);
+    console.error(`Command failed: ${config.prepare}`);
+  }
+});
+
+console.log(`Using graders: ${JSON.stringify(config.graders)}`)
 
 class Isolate {
   static get langs() {

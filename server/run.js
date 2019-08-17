@@ -1,7 +1,7 @@
 const Joi = require("@hapi/joi");
 const router = require("express").Router();
 
-const {getTestDir, loadTestcases} = require(__rootdir + "/server/util.js");
+const {getTestDir, loadTestcases, joiError} = require(__rootdir + "/server/util.js");
 const config = require(__rootdir + "/config.json");
 
 const fs = require("fs");
@@ -25,12 +25,8 @@ const apiSchema = Joi.object().keys({
 
 router.post("/", (req, res) => {
   apiSchema.validate(req.body, (err, data) => {
-    if(err) {
-      return res.status(400).send({
-        err: "Parameter validation failed",
-        details: err.details.map(err => err.message)
-      });
-    }
+    if (err) return joiError(res, err);
+
     const {lang, source, filename, testsuite, grader, tests} = data;
     const box = new Isolate(lang);
 

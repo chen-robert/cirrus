@@ -63,4 +63,11 @@ const prepareGraders = () => {
   });
 }
 
-module.exports = {getPath, getTestDir, getGraderDir, loadTestcases, which, prepareGraders};
+const joiError = (res, err) => {
+  res.status(400).send({
+    err: "Parameter validation failed",
+    details: err.details.map(err => err.message)
+  })
+}
+
+module.exports = {getPath, getTestDir, getGraderDir, loadTestcases, which, prepareGraders, joiError};

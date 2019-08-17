@@ -38,6 +38,8 @@ config.graders.forEach(grader => {
   const graderDir = getGraderDir(grader);
   const config = require(`${graderDir}/config.json`);
 
+  if(!config.prepare) return;
+
   try{
     execSync(config.prepare, {
       cwd: graderDir
@@ -159,7 +161,7 @@ class Isolate {
     const graderConfig = require(`${graderDir}/config.json`);
     const {cmd, args} = graderConfig;
 
-    const graderProcess = spawn(cmd, args, {
+    const graderProcess = spawn(cmd, args || [], {
       cwd: graderDir,
       env: {
         "INPUT_PATH": inFile,

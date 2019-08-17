@@ -7,6 +7,8 @@ const Joi = require("@hapi/joi");
 const crypto = require("crypto");
 const fs = require("fs");
 
+const config = require(__rootdir + "/config.json");
+
 const {getPath} = require(__rootdir + "/server/util.js");
 
 const PORT = process.env.PORT || 3000;
@@ -74,6 +76,9 @@ app.post("/upload",
 );
 
 app.use("/run", require(__rootdir + "/server/run.js"));
+
+app.get("/langs", (req, res) => res.send(config.langs));
+app.get("/graders", (req, res) => res.send(config.graders));
 
 
 app.listen(PORT, () => console.log(`Started server at port ${PORT}`));

@@ -42,10 +42,10 @@ router.post("/", (req, res) => {
             const inputFile = `${testsuiteDir}/${name + config.inExt}`;
             const outputFile = `${testsuiteDir}/${name + config.outExt}`;
             if(grader) {
-              box.runGrader(inputFile, outputFile, grader, {}, (err, result) => {
+              box.runGrader(inputFile, outputFile, grader, {}, (err, status) => {
                 resolve({
                   name,
-                  result,
+                  status,
                   err
                 });
               })

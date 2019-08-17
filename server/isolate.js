@@ -4,6 +4,8 @@ const Joi = require("@hapi/joi");
 const fs = require("fs");
 const path = require("path");
 
+const {getGraderDir} = require(__rootdir + "/server/util.js");
+
 const { exec, execSync, spawn } = require('child_process');
 
 const TESTING = process.env.TESTING !== undefined;
@@ -29,7 +31,7 @@ const optToFlag = {
   time: "--time",
   wallTime: "--wall-time",
   mem: "--cg-mem",
-  inFile: "--stdin"
+  inFile: "--stdin",
 }
 
 class Isolate {
@@ -84,7 +86,10 @@ class Isolate {
           key => `${optToFlag[key]} ${opts[key]}`
         ).join(" ")
       }`;
-      cmd = `${cmd} --run --`;
+
+      // Force redirect of stderr to stdout. 
+      // Stderr is reserved for isolate.
+      cmd = `${cmd} --stderr-to-stdout --run --`;
     }
     return cmd;
   }
@@ -99,13 +104,16 @@ class Isolate {
     opts = Object.assign(compileDefaults, opts);
     let cmd = this.getCommandBase(opts);
 
-    const compileCmd = this.config.compile.cmd;
-    const compileOpts = this.config.compile.opts;
-
     if(TESTING) cmd = `cd ${this.rootPath} &&`;
-    cmd = `${cmd} ${compileCmd} ${compileOpts.join(" ")} ${source}`;
+    cmd = `${cmd} ${getFullCmd(this.config.compile)} ${source}`;
 
     exec(cmd, cb);
+  }
+
+  getFullCmd(config) {
+    const {cmd, opts} = config;
+
+    return `${cmd} ${opts.join(" ")}`;
   }
 
   run(inFile, opts, cb) {
@@ -121,16 +129,18 @@ class Isolate {
     let cmd = this.getCommandBase(opts);
 
     if(this.config.run) {
-      const compileCmd = this.config.compile.cmd;
-      const compileOpts = this.config.compile.opts;
-    } else {
-      cmd = `${cmd} ${TESTING? this.rootPath + "/" : ""}${this.compiledFile}`;
+      cmd = `${cmd} ${getFullCmd(this.config.run)}`;
     }
+    
+    cmd = `${cmd} ${TESTING? this.rootPath + "/" : ""}${this.compiledFile}`;
+    
 
     return cmd;
   }
 
-  runGrader(inFile, outFile, graderDir, opts, cb) {
+  runGrader(inFile, outFile, grader, opts, cb) {
+    const graderDir = getGraderDir(grader);
+
     const graderConfig = require(`${graderDir}/config.json`);
     const {cmd, args} = graderConfig;
 
@@ -165,8 +175,6 @@ class Isolate {
       execSync(`${this.isolateCmd} --destroy`);
     }
   }
-
-
 }
 
 

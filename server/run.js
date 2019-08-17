@@ -1,7 +1,7 @@
 const Joi = require("@hapi/joi");
 const router = require("express").Router();
 
-const {getTestDir, getGraderDir} = require(__rootdir + "/server/util.js");
+const {getTestDir} = require(__rootdir + "/server/util.js");
 const config = require(__rootdir + "/config.json");
 
 const fs = require("fs");
@@ -14,12 +14,14 @@ const apiSchema = Joi.object().keys({
   lang: Joi.string().valid(Isolate.langs).required(),
   source: Joi.string().required(),
   filename: Joi.string().regex(/^[a-zA-Z0-9\.]*$/).max(30).required(),
-  testsuite: Joi.string().alphanum().max(30).default("global"),
+
   grader: Joi.string().valid(config.graders),
+  testsuite: Joi.string().alphanum().max(30).default("global"),
   tests: Joi.array(),
+  
   compile: isolateSchema,
   execute: isolateSchema,
-}).without("testsuite", "tests");
+});
 
 router.post("/", (req, res) => {
   apiSchema.validate(req.body, (err, data) => {
@@ -63,9 +65,10 @@ router.post("/", (req, res) => {
           const name = getTestName(testcases[i])
           
           if(grader) {
-            const outputFile = name + config.outExt;
+            const inputFile = `${testsuiteDir}/${name + config.inExt}`;
+            const outputFile = `${testsuiteDir}/${name + config.outExt}`;
 
-            box.runGrader(`${testsuiteDir}/${testcases[i]}`, `${testsuiteDir}/${outputFile}`, getGraderDir(grader), {}, (err, result) => {
+            box.runGrader(inputFile, outputFile, grader, {}, (err, result) => {
               results.push({
                 name,
                 result,

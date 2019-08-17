@@ -132,13 +132,14 @@ class Isolate {
     }
     
     this.name = source.split(".")[0];
+    this.sourceFile = source;
     this.compiledFile = this.parseSpecial(this.config.out); 
 
     opts = Object.assign(compileDefaults, opts);
     let cmd = this.getCommandBase(opts);
 
     if(TESTING) cmd = `cd ${this.rootPath} &&`;
-    cmd = `${cmd} ${this.getFullCmd(this.config.compile)} ${source}`;
+    cmd = `${cmd} ${this.getFullCmd(this.config.compile)}`;
 
     exec(cmd, cb);
   }
@@ -147,7 +148,8 @@ class Isolate {
     return name
       .replace(/\$NAME/g, this.name)
       .replace(/\$OUTFILE/g, (TESTING ? this.rootPath: "") + "/" + this.compiledFile)
-      .replace(/\$ROOTPATH/g, TESTING? this.rootPath: "/box");
+      .replace(/\$ROOTPATH/g, TESTING? this.rootPath: "/box")
+      .replace(/\$SOURCEFILE/g, this.sourceFile);
   }
 
   getFullCmd(config) {

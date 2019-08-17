@@ -3,7 +3,17 @@
     "c": {
       "compile": {
         "cmd": "gcc",
-        "opts": ["-std=c11", "-Wall", "-Wextra", "-O3", "-lm", "-o", "a.o"]
+        "opts": ["-std=c11", "-Wall", "-Wextra", "-O3", "-lm", "-o", "a.o", "$SOURCEFILE"]
+      },
+      "run": {
+        "cmd": "$OUTFILE"
+      },
+      "out": "a.o"
+    },
+    "c++17": {
+      "compile": {
+        "cmd": "gcc",
+        "opts": ["-std=c++17", "-Wall", "-Wextra", "-O3", "-lm", "-o", "a.o", "$SOURCEFILE"]
       },
       "run": {
         "cmd": "$OUTFILE"
@@ -12,7 +22,8 @@
     },
     "java": {
       "compile": {
-        "cmd": "javac"
+        "cmd": "javac",
+        "opts": ["$SOURCEFILE"]
       },
       "run": {
         "cmd": "java",

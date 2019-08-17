@@ -10,5 +10,8 @@
   },
   "inExt": ".in",
   "outExt": ".out",
-  "graders": ["default"]
+  "graders": ["default"],
+  "testsDir": "uploads/tests",
+  "graderDir": "graders",
+  "runTestsAsync": false
 }

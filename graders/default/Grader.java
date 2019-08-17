@@ -18,11 +18,6 @@ public class Grader {
             pipeStream(new FileInputStream(inPath), p.getOutputStream());
         }catch(IOException ioe) {}
 
-        if(p.waitFor() != 0){
-            System.out.println("RTE");
-            return;
-        }
-
         ArrayList<String> ans = new ArrayList<>();
         ArrayList<String> produced = new ArrayList<>();
 
@@ -31,12 +26,18 @@ public class Grader {
 
         Scanner program = new Scanner(new BufferedInputStream(p.getInputStream()));
         while(program.hasNextLine()) produced.add(program.nextLine().trim());
+        
+        in.close();
+        program.close();
+
+        if(p.waitFor() != 0){
+            System.out.println("RTE");
+            return;
+        }
 
         if(ans.equals(produced)) System.out.println("AC");
         else System.out.println("WA");
 
-        in.close();
-        program.close();
     }
 
     public static void pipeStream(InputStream input, OutputStream output)

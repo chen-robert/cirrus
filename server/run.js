@@ -1,7 +1,7 @@
 const Joi = require("@hapi/joi");
 const router = require("express").Router();
 
-const {getTestDir} = require(__rootdir + "/server/util.js");
+const {getTestDir, loadTestcases} = require(__rootdir + "/server/util.js");
 const config = require(__rootdir + "/config.json");
 
 const fs = require("fs");
@@ -35,62 +35,51 @@ router.post("/", (req, res) => {
     const box = new Isolate(lang);
 
     const runAllTests = () => {
-      const testsuiteDir = getTestDir(testsuite);
-      fs.readdir(testsuiteDir, (err, files) => {
-        if(err) {
-          return res.status(400).send(`Invalid testsuite: ${testsuite}`);
+      loadTestcases(testsuite, tests, async testcases => {
+        const runTest = name => {
+          return new Promise(resolve => {
+            const testsuiteDir = getTestDir(testsuite);
+            const inputFile = `${testsuiteDir}/${name + config.inExt}`;
+            const outputFile = `${testsuiteDir}/${name + config.outExt}`;
+            if(grader) {
+              box.runGrader(inputFile, outputFile, grader, {}, (err, result) => {
+                resolve({
+                  name,
+                  result,
+                  err
+                });
+              })
+            } else {
+              box.run(inputFile, {}, (err, stdout, stderr) => {
+                resolve({
+                  name,
+                  err,
+                  stdout,
+                  stderr
+                });
+              });
+            }
+          });
         }
 
-        const getTestName = inFileName => inFileName.substring(0, inFileName.length - config.inExt.length);
+        if(config.runTestsAsync) {
+          Promise
+            .all(testcases.map(runTest))
+            .then(results => {
+              box.destroy();
+              res.send(results);
+            });
+        } else {
+          const results = [];
+          for(let i = 0; i < testcases.length; i++){
+            const val = await runTest(testcases[i]);
+            results.push(val);
+          }
 
-        const testcases = files
-          .filter(file => file.endsWith(config.inExt))
-          .filter(file => {
-            if(!tests) return true;
-            return tests.includes(getTestName(file));
-          });
-
-        const results = [];
-
-        const finish = () => {
           box.destroy();
           res.send(results);
         }
 
-        const runTest = () => {
-          let i = results.length;
-
-          if(i === testcases.length) return finish();
-          
-          const name = getTestName(testcases[i])
-          
-          if(grader) {
-            const inputFile = `${testsuiteDir}/${name + config.inExt}`;
-            const outputFile = `${testsuiteDir}/${name + config.outExt}`;
-
-            box.runGrader(inputFile, outputFile, grader, {}, (err, result) => {
-              results.push({
-                name,
-                result,
-                err
-              });
-
-              runTest();
-            })
-          } else {
-            box.run(`${testsuiteDir}/${testcases[i]}`, {}, (err, stdout, stderr) => {
-              results.push({
-                name,
-                err,
-                stdout,
-                stderr
-              });
-              runTest();
-            });
-          }
-        }
-
-        runTest();
       });
     }
 

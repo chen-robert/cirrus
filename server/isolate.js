@@ -105,7 +105,7 @@ class Isolate {
     let cmd = this.getCommandBase(opts);
 
     if(TESTING) cmd = `cd ${this.rootPath} &&`;
-    cmd = `${cmd} ${getFullCmd(this.config.compile)} ${source}`;
+    cmd = `${cmd} ${this.getFullCmd(this.config.compile)} ${source}`;
 
     exec(cmd, cb);
   }
@@ -129,11 +129,10 @@ class Isolate {
     let cmd = this.getCommandBase(opts);
 
     if(this.config.run) {
-      cmd = `${cmd} ${getFullCmd(this.config.run)}`;
+      cmd = `${cmd} ${this.getFullCmd(this.config.run)}`;
     }
     
     cmd = `${cmd} ${TESTING? this.rootPath + "/" : ""}${this.compiledFile}`;
-    
 
     return cmd;
   }
@@ -144,7 +143,7 @@ class Isolate {
     const graderConfig = require(`${graderDir}/config.json`);
     const {cmd, args} = graderConfig;
 
-    const grader = spawn(cmd, args, {
+    const graderProcess = spawn(cmd, args, {
       cwd: graderDir,
       env: {
         "INPUT_PATH": inFile,
@@ -153,12 +152,14 @@ class Isolate {
       }
     });
 
+    console.log(inFile, outFile, this.runCmd(opts));
+
     let stdout = "";
     let stderr = "";
-    grader.stdout.on("data", data => stdout += data);
-    grader.stderr.on("data", data => stderr += data);
+    graderProcess.stdout.on("data", data => stdout += data);
+    graderProcess.stderr.on("data", data => stderr += data);
 
-    grader.on("close", code => {
+    graderProcess.on("close", code => {
       if(code != 0) {
         console.log(`Grader exited with error code: ${code}`);
         console.log(`Stderr: ${stderr}`);

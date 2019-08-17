@@ -9,7 +9,7 @@ const fs = require("fs");
 
 const config = require(__rootdir + "/config.json");
 
-const {getPath} = require(__rootdir + "/server/util.js");
+const {getPath, prepareGraders} = require(__rootdir + "/server/util.js");
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,6 +18,8 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+prepareGraders();
+console.log(`Using graders: ${JSON.stringify(config.graders)}`);
 
 const upload = require("multer")({
   limits: {

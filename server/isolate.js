@@ -4,7 +4,7 @@ const Joi = require("@hapi/joi");
 const fs = require("fs");
 const path = require("path");
 
-const {getGraderDir} = require(__rootdir + "/server/util.js");
+const {getGraderDir, which} = require(__rootdir + "/server/util.js");
 
 const { exec, execSync, spawn } = require('child_process');
 
@@ -32,37 +32,6 @@ const optToFlag = {
   wallTime: "--wall-time",
   mem: "--cg-mem",
   inFile: "--stdin",
-}
-
-config.graders.forEach(grader => {
-  const graderDir = getGraderDir(grader);
-  const config = require(`${graderDir}/config.json`);
-
-  if(!config.prepare) return;
-
-  try{
-    execSync(config.prepare, {
-      cwd: graderDir
-    });
-  } catch (e) {
-    console.error(`Failed to prepare grader in ${graderDir}`);
-    console.error(`Command failed: ${config.prepare}`);
-  }
-});
-
-console.log(`Using graders: ${JSON.stringify(config.graders)}`);
-
-const memo = {};
-const which = binary => {
-  if(memo[binary]) return memo[binary];
-
-  const dirs = process.env.PATH.split(":");
-
-  memo[binary] = dirs
-    .map(dir => `${dir}/${binary}`)
-    .filter(dir => fs.existsSync(dir))[0] || binary;
-
-  return memo[binary];
 }
 
 class Isolate {

@@ -17,6 +17,11 @@ chai.use(chaiHttp);
 
 const problemDataPath = __dirname + "/../samples/tests";
 describe("Routes", () => {
+  after(done => {
+    server.close();
+    done();
+  });
+
   describe("GET /langs", () => {
     it('it should GET an object describing available languages', (done) => {
       chai.request(server)
@@ -75,10 +80,7 @@ describe("Routes", () => {
 
           done();
         })
-    });
-  });
-
-  describe("POST /upload with an invalid testsuite", () => {
+      });
     it("it should error because testsuite is too long", done => {
       chai.request(server)
         .post("/upload")
@@ -89,12 +91,12 @@ describe("Routes", () => {
           res.should.have.status(400);
           res.body.should.be.an("object");
           res.body.err.should.be.a("string");
-
+  
           done();
         })
     });
-
-
+  
+  
     it("it should error because of invalid characters", done => {
       chai.request(server)
         .post("/upload")
@@ -105,7 +107,7 @@ describe("Routes", () => {
           res.should.have.status(400);
           res.body.should.be.an("object");
           res.body.err.should.be.a("string");
-
+  
           done();
         })
     });

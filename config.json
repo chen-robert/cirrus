@@ -8,7 +8,8 @@
       "run": {
         "cmd": "$OUTFILE"
       },
-      "out": "a.o"
+      "out": "a.o",
+      "test": "sample.c"
     },
     "c++17": {
       "compile": {
@@ -29,19 +30,15 @@
         "cmd": "java",
         "opts": ["-classpath", "$ROOTPATH", "$NAME"]
       },
-      "out": "$NAME.class"
+      "out": "$NAME.class",
+      "test": "Sample.java"
     },
     "python3": {
       "run": {
         "cmd": "python3",
         "opts": ["$OUTFILE"]
-      }
-    },
-    "python2": {
-      "run": {
-        "cmd": "python",
-        "opts": ["$OUTFILE"]
-      }
+      },
+      "test": "sample3.py"
     }
   },
   "inExt": ".in",

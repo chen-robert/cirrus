@@ -35,13 +35,24 @@ describe("Routes", () => {
   });
 
   describe("GET /status/:testsuite", () => {
-    it('it should return false on invalid testsuite', (done) => {
+    it('it should return false on nonexistent testsuite', (done) => {
       chai.request(server)
         .get('/status/notarealtestsuite')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('object');
           res.body.exists.should.equal(false);
+          done();
+        });
+    });
+
+    it('it should error on invalid testsuite namem', (done) => {
+      chai.request(server)
+        .get('/status/invalid.testsuite')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.an('object');
+          res.body.err.should.be.a("string");
           done();
         });
     });

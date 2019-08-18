@@ -21,7 +21,7 @@ router.get("/:group", (req, res) => {
     if (err) return joiError(res, err);
 
     res.send({
-      data: fs.existsSync(getTestDir(group))
+      exists: fs.existsSync(getTestDir(group))
     })
   });
 });
@@ -36,11 +36,14 @@ router.get("/:group/:name", (req, res) => {
         if(err) return res.status(500).send("Failed to read file");
         
         return res.send({
-          data: crypto.createHash("sha256").update(buffer).digest("base64")
+          exists: true,
+          hash: crypto.createHash("sha256").update(buffer).digest("base64")
         });
       });
     } else {
-      return res.status(400).send("File not found");
+      return res.send({
+        exists: false
+      });
     }
   });
 });

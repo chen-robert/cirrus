@@ -34,6 +34,19 @@ describe("Routes", () => {
     });
   });
 
+  describe("GET /status/:testsuite", () => {
+    it('it should return false on invalid testsuite', (done) => {
+      chai.request(server)
+        .get('/status/notarealtestsuite')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('object');
+          res.body.exists.should.equal(false);
+          done();
+        });
+    });
+  })
+
   describe("GET /graders", () => {
     it('it should GET all the graders', (done) => {
       chai.request(server)

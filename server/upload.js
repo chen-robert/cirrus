@@ -17,7 +17,7 @@ const upload = require("multer")({
   limits: {
     fileSize: 100 * 1000 * 1000
   }, 
-  dest: __rootdir + "/tmp/uploads"
+  dest: __rootdir + "/uploads/tmp"
 });
 
 router.post("/", 

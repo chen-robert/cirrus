@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 prepareGraders();
 console.log(`Using graders: ${JSON.stringify(config.graders)}`);
 
-app.use("/hash", require(__rootdir + "/server/hash.js"));
+app.use("/status", require(__rootdir + "/server/status.js"));
 app.use("/upload", require(__rootdir + "/server/upload.js"));
 app.use("/run", require(__rootdir + "/server/run.js"));
 

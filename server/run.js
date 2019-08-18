@@ -16,7 +16,7 @@ const apiSchema = Joi.object().keys({
   filename: Joi.string().regex(/^[a-zA-Z0-9\.]*$/).max(30).required(),
 
   grader: Joi.string().valid(config.graders),
-  testsuite: Joi.string().alphanum().max(30).default("global"),
+  testsuite: Joi.string().alphanum().max(30).default(config.defaultTestsuite),
   tests: Joi.array(),
   
   compile: isolateSchema,

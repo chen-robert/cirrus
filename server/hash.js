@@ -3,11 +3,13 @@ const router = require("express").Router();
 const fs = require("fs");
 const crypto = require("crypto");
 
+const config = require(__rootdir + "/config.json");
+
 const {getPath, joiError} = require(__rootdir + "/server/util.js");
 
 const apiSchema = Joi.object().keys({
   name: Joi.string().regex(/[a-zA-Z0-9\.]*/).max(30).required(),
-  group: Joi.string().alphanum().max(30).default("global"),
+  group: Joi.string().alphanum().max(30).default(config.defaultTestsuite),
 });
 
 router.get("/:group/:name", (req, res) => {

@@ -49,5 +49,6 @@
   "testsDir": "uploads/tests",
   "graderDir": "graders",
   "graders": ["default", "strict"],
-  "runTestsAsync": false
+  "runTestsAsync": false,
+  "defaultTestsuite": "global"
 }

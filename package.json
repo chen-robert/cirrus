@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
+    "langs": "mocha test/run.js",
     "dev": "nodemon -e js,json --watch index.js --watch server --watch graders index.js"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/chen-robert/cirrus.git"
   },
   "author": "Robert Chen",
   "license": "MIT",

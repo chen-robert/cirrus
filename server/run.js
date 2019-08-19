@@ -31,7 +31,9 @@ router.post("/", (req, res) => {
     const box = new Isolate(lang);
 
     const runAllTests = () => {
-      loadTestcases(testsuite, tests, async testcases => {
+      loadTestcases(testsuite, tests, async (err, testcases) => {
+        if(err) return res.status(400).send(`Invalid testsuite: ${testsuite}`);
+        
         const runTest = name => {
           return new Promise(resolve => {
             const testsuiteDir = getTestDir(testsuite);

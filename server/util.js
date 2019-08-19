@@ -14,9 +14,7 @@ const getGraderDir = name => `${graderPath}/${name}`;
 const loadTestcases = (testsuite, tests, cb) => {
   const testsuiteDir = getTestDir(testsuite);
   fs.readdir(testsuiteDir, (err, files) => {
-    if(err) {
-      return res.status(400).send(`Invalid testsuite: ${testsuite}`);
-    }
+    if(err) return cb(err);
 
     const getTestName = inFileName => inFileName.substring(0, inFileName.length - config.inExt.length);
 
@@ -28,7 +26,7 @@ const loadTestcases = (testsuite, tests, cb) => {
       })
       .map(getTestName);
 
-    cb(testcases);
+    cb(null, testcases);
   });
 }
 

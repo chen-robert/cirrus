@@ -34,6 +34,13 @@ const optToFlag = {
   inFile: "--stdin",
 }
 
+// A bit hacky
+if(!TESTING) {
+  for(let i = 0; i < 1000; i++){
+    execSync(`${isolateCmd} --cleanup -b ${i}`);
+  }
+}
+
 class Isolate {
   static get langs() {
     return Object.keys(config.langs);
@@ -67,7 +74,9 @@ class Isolate {
       this.rootPath = `${__rootdir}/tmp/${boxId}`
       fs.mkdirSync(this.rootPath, { recursive: true });
     } else {
-      const resp = execSync(`${isolateCmd} --init -b ${boxId}`);
+      const resp = execSync(`${isolateCmd} --init -b ${boxId}`)
+        .toString()
+        .trim();
 
       if(resp.includes("Sandbox ID out of range")) throw "Out of isolate boxes";
 
@@ -184,7 +193,7 @@ class Isolate {
     cache.push(this.boxId);
 
     if(!TESTING) {
-      execSync(`${this.isolateCmd} --destroy`);
+      execSync(`${this.isolateCmd} --cleanup`);
     }
   }
 }

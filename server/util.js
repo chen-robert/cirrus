@@ -48,7 +48,14 @@ which.memo = {};
 const prepareGraders = () => {
   config.graders.forEach(grader => {
     const graderDir = getGraderDir(grader);
-    const config = require(`${graderDir}/config.json`);
+    const configPath = `${graderDir}/config.json`;
+
+    if(!fs.existsSync(configPath)) {
+      console.error(`ERROR: Missing config file for ${grader}.`);
+      console.error(`Expected config at ${configPath}`);
+      return;
+    }
+    const config = require(configPath);
   
     if(!config.prepare) return;
   
@@ -57,8 +64,8 @@ const prepareGraders = () => {
         cwd: graderDir
       });
     } catch (e) {
-      console.error(`Failed to prepare grader in ${graderDir}`);
       console.error(`Command failed: ${config.prepare}`);
+      console.error(`Failed to prepare grader in ${graderDir}`);
     }
   });
 }

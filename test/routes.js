@@ -64,7 +64,8 @@ describe("Routes", () => {
         .get('/graders')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.be.an('array');
+          res.body.should.be.an('object');
+          res.body.graders.should.be.an("array");
           done();
         });
     });

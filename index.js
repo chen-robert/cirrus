@@ -21,7 +21,7 @@ app.use("/upload", require(__rootdir + "/server/upload.js"));
 app.use("/run", require(__rootdir + "/server/run.js"));
 
 app.get("/langs", (req, res) => res.send(config.langs));
-app.get("/graders", (req, res) => res.send(config.graders));
+app.get("/graders", (req, res) => res.send({ graders: config.graders}));
 
 const server = app.listen(PORT, () => console.log(`Started server at port ${PORT}`));
 

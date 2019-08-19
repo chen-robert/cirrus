@@ -81,10 +81,12 @@ An JSON object with availble languages as keys. A language is a valid option if 
 
 #### Returns
 
-An array of strings representing the valid graders.
+An array of strings under the key `graders`, representing the valid graders.
 
 ```json
-["default","strict"]
+{
+  graders: ["default","strict"]
+}
 ```
 
 ### POST `/run`

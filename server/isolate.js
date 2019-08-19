@@ -18,20 +18,23 @@ const isolateCmd = "isolate --cg";
 const compileDefaults = {
   time: 1,
   wallTime: 10,
-  mem: 10 * 1000
+  mem: 10 * 1000,
+  processes: 100
 }
 
 const runDefaults = {
   time: 4,
   wallTime: 40,
   mem: 100 * 1000,
+  processes: 100
 }
 
 const optToFlag = {
   time: "--time",
   wallTime: "--wall-time",
   mem: "--cg-mem",
-  inFile: "--stdin",
+  processes: "-p",
+  inFile: "--stdin"
 }
 
 // A bit hacky

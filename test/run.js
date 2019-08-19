@@ -92,10 +92,11 @@ describe("Compilation and Execution", () => {
     const testLang = langs[0];
     const testFile = config.langs[testLang].test;
 
-    const standardErrorHandler = done => (err, res) => {
+    const standardErrorHandler = (done, errStr) => (err, res) => {
       res.should.have.status(400);
       res.body.should.be.an("object");
       res.body.err.should.be.a("string");
+      res.body.err.should.include(errStr);
 
       done();
     }
@@ -115,28 +116,28 @@ describe("Compilation and Execution", () => {
         chai.request(server)
           .post("/run")
           .send(apiTemplate({tests: "notarealtestsuite"}))
-          .end(standardErrorHandler(done));
+          .end(standardErrorHandler(done, "testsuite"));
       });
 
       it("it should error on nonexistent grader", done => {
         chai.request(server)
           .post("/run")
           .send(apiTemplate({grader: "notarealgrader"}))
-          .end(standardErrorHandler(done));
+          .end(standardErrorHandler(done, "grader"));
       });
 
       it("it should error on nonexistent lang", done => {
         chai.request(server)
           .post("/run")
           .send(apiTemplate({lang: "notareallang"}))
-          .end(standardErrorHandler(done));
+          .end(standardErrorHandler(done, "lang"));
       });
 
       it("it should error on invalid filename", done => {
         chai.request(server)
           .post("/run")
-          .send(apiTemplate({lang: "invalid../filename"}))
-          .end(standardErrorHandler(done));
+          .send(apiTemplate({filename: "invalid../filename"}))
+          .end(standardErrorHandler(done, "filename"));
       });
     });
   }

@@ -65,7 +65,7 @@ const prepareGraders = () => {
 
 const joiError = (res, err) => {
   res.status(400).send({
-    err: "Parameter validation failed",
+    err: `Parameter validation failed: ${err.details.map(err => err.message).join(", ")}`,
     details: err.details.map(err => err.message)
   })
 }

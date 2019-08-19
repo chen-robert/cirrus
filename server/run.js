@@ -26,67 +26,74 @@ const apiSchema = Joi.object().keys({
 router.post("/", async (req, res) => {
   const data = await apiSchema.validate(req.body)
     .catch(err => joiError(res, err));
-
   if(!data) return;
     
   const {lang, source, filename, testsuite, grader, tests, compileOpts, executeOpts} = data;
   const box = new Isolate(lang);
 
-  loadTestcases(testsuite, tests, async (err, testcases) => {
-    if(err) return res.status(400).send({
+  if(!fs.existsSync(getTestDir(testsuite))) {
+    return res.status(400).send({
       err: `Invalid testsuite: ${testsuite}`
+    });  
+  }
+
+  const testcases = await loadTestcases(testsuite, tests)
+    .catch(err => {
+      res.status(500).send({
+        err: "Failed to read testcases from folder",
+        message: err
+      });
+    });
+  if(!testcases) return;
+
+  fs.writeFileSync(`${box.rootPath}/${filename}`, source);
+  await box.compile(filename, compileOpts)
+    .catch(({stdout, stderr}) => {
+      res.send({
+        err: "Compilation error",
+        stderr: stderr,
+        stdout: stdout
+      });
     });
 
-    fs.writeFileSync(`${box.rootPath}/${filename}`, source);
-    await box.compile(filename, compileOpts)
-      .catch(({stdout, stderr}) => {
-        res.send({
-          err: "Compilation error",
-          stderr: stderr,
-          stdout: stdout
-        });
-      });
+  const runTest = async name => {
+    const ret = {name};
 
-    const runTest = async name => {
-      const ret = {name};
-
-      const testsuiteDir = getTestDir(testsuite);
-      const inputFile = `${testsuiteDir}/${name + config.inExt}`;
-      const outputFile = `${testsuiteDir}/${name + config.outExt}`;
+    const testsuiteDir = getTestDir(testsuite);
+    const inputFile = `${testsuiteDir}/${name + config.inExt}`;
+    const outputFile = `${testsuiteDir}/${name + config.outExt}`;
+    
+    if(grader) {
+      let {err, status} = await box.runGrader(inputFile, outputFile, grader, executeOpts);
+      if(status) status = status.trim();
       
-      if(grader) {
-        let {err, status} = await box.runGrader(inputFile, outputFile, grader, executeOpts);
-        if(status) status = status.trim();
-        
-        Object.assign(ret, {
-          status,
-          err
-        });
-      } else {
-        const inputFileName = name + config.inExt;
-
-        fs.copyFileSync(inputFile, `${box.rootPath}/${inputFileName}`);
-        const {err, stdout, stderr} = await box.run(inputFileName, executeOpts);
-        
-        Object.assign(ret, {
-          err,
-          stdout,
-          stderr
-        });
-      }
-
-      return ret;
+      Object.assign(ret, {
+        status,
+        err
+      });
+    } else {
+      const inputFileName = name + config.inExt;
+      fs.copyFileSync(inputFile, `${box.rootPath}/${inputFileName}`);
+      const {err, stdout, stderr} = await box.run(inputFileName, executeOpts);
+      
+      Object.assign(ret, {
+        err,
+        stdout,
+        stderr
+      });
     }
 
-    const results = [];
-    for(let i = 0; i < testcases.length; i++){
-      const val = await runTest(testcases[i]);
-      results.push(val);
-    }
+    return ret;
+  }
 
-    box.destroy();
-    res.send(results);
-  });  
+  const results = [];
+  for(let i = 0; i < testcases.length; i++){
+    const val = await runTest(testcases[i]);
+    results.push(val);
+  }
+
+  box.destroy();
+  res.send(results);
 });
 
 module.exports = router;

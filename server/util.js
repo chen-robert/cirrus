@@ -12,22 +12,24 @@ const getTestDir = group => `${testsPath}/${group}`;
 const getGraderDir = name => `${graderPath}/${name}`;
 
 const loadTestcases = (testsuite, tests) => {
-  const testsuiteDir = getTestDir(testsuite);
-  fs.readdir(testsuiteDir, (err, files) => {
-    if(err) return cb(err);
-
-    const getTestName = inFileName => inFileName.substring(0, inFileName.length - config.inExt.length);
-
-    const testcases = files
-      .filter(file => file.endsWith(config.inExt))
-      .filter(file => {
-        if(!tests) return true;
-        return tests.includes(getTestName(file));
-      })
-      .map(getTestName);
-
-    cb(null, testcases);
-  });
+  return new Promise((resolve, reject) => {
+    const testsuiteDir = getTestDir(testsuite);
+    fs.readdir(testsuiteDir, (err, files) => {
+      if(err) return reject(err);
+  
+      const getTestName = inFileName => inFileName.substring(0, inFileName.length - config.inExt.length);
+  
+      const testcases = files
+        .filter(file => file.endsWith(config.inExt))
+        .filter(file => {
+          if(!tests) return true;
+          return tests.includes(getTestName(file));
+        })
+        .map(getTestName);
+  
+      resolve(testcases);
+    });
+  })
 }
 
 const which = binary => {

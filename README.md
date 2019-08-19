@@ -99,8 +99,8 @@ An array of strings representing the valid graders.
 | grader | A grader to evaluate the program. Valid choices are found at `/graders`. If no grader is specified, stdout will be returned instead | No |
 | testsuite | The name of the testsuite to use. Defaults to "global" | No |
 | tests | The tests under `testsuite` to run. If none specified, all the tests under `testsuite` will be run | No |
-| compile | Isolate options for compiling | No |
-| execute | Isolate options for running | No |
+| compileOpts | Isolate options for compiling | No |
+| executeOpts | Isolate options for running | No |
 
 ##### Isolate Options
 
@@ -115,10 +115,10 @@ An array of strings representing the valid graders.
   "lang": "c",
   "filename": "a.c",
   "source": "...",
-  "compile": {
+  "compileOpts": {
     "time": 1
   },
-  "execute": {
+  "executeOpts": {
     "time": 1,
     "wallTime": 10
   },

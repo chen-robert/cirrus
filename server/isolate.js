@@ -1,31 +1,17 @@
-const config = require(__rootdir + "/config.json");
 const Joi = require("@hapi/joi");
-
 const fs = require("fs");
 const path = require("path");
 
+const { exec, execSync, spawn } = require('child_process');
+const config = require(__rootdir + "/config.json");
+const {compileDefaults, executeDefaults} = config;
 const {getGraderDir, which} = require(__rootdir + "/server/util.js");
 
-const { exec, execSync, spawn } = require('child_process');
-
 const TESTING = process.env.TESTING !== undefined;
+const isolateCmd = "isolate --cg -p";
 
 const cache = [];
 let lim = 0;
-
-const isolateCmd = "isolate --cg -p";
-
-const compileDefaults = {
-  time: 1,
-  wallTime: 10,
-  mem: 10 * 1000
-}
-
-const runDefaults = {
-  time: 4,
-  wallTime: 40,
-  mem: 100 * 1000
-}
 
 const optToFlag = {
   time: "--time",
@@ -148,7 +134,7 @@ class Isolate {
 
   run(inFile, opts) {
     return new Promise(resolve => {
-      opts = Object.assign(runDefaults, opts, {inFile});
+      opts = Object.assign(executeDefaults, opts, {inFile});
       let cmd = this.runCmd(opts);
   
       if(TESTING) cmd = `cat ${this.rootPath}/${inFile} | ${cmd}`;

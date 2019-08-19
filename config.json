@@ -46,5 +46,16 @@
   "testsDir": "uploads/tests",
   "graderDir": "graders",
   "graders": ["default", "strict"],
-  "defaultTestsuite": "global"
+  "defaultTestsuite": "global",
+  "compileDefaults": {
+    "time": 1,
+    "wallTime": 10,
+    "mem": 10000
+  },
+  "executeDefaults": {
+    "time": 4,
+    "wallTime": 40,
+    "mem": 100000
+  }
+
 }

@@ -110,7 +110,9 @@ An array of strings under the key `graders`, representing the valid graders.
 | --- | --- | --- |
 | time | The maximum runtime of the program | No |
 | wallTime | The maximum walltime. This clock does not stop when the program has lost the CPU or when it is waiting for an external event | No |
-| mem | The maximum memory used by the program | No |
+| mem | The maximum memory used by the program. Measured in KB. | No |
+
+Compile and execute defaults are specified under `config.compileDefaults` and `config.executeDefaults` respectively.
 
 ```json
 {

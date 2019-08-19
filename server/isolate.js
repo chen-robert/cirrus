@@ -13,20 +13,18 @@ const TESTING = process.env.TESTING !== undefined;
 const cache = [];
 let lim = 0;
 
-const isolateCmd = "isolate --cg";
+const isolateCmd = "isolate --cg -p";
 
 const compileDefaults = {
   time: 1,
   wallTime: 10,
-  mem: 10 * 1000,
-  processes: 100
+  mem: 10 * 1000
 }
 
 const runDefaults = {
   time: 4,
   wallTime: 40,
-  mem: 100 * 1000,
-  processes: 100
+  mem: 100 * 1000
 }
 
 const optToFlag = {
@@ -128,7 +126,7 @@ class Isolate {
   parseSpecial(name) {
     return name
       .replace(/\$NAME/g, this.name)
-      .replace(/\$OUTFILE/g, (TESTING ? this.rootPath: "") + "/" + this.compiledFile)
+      .replace(/\$OUTFILE/g, (TESTING ? this.rootPath + "/": "") + this.compiledFile)
       .replace(/\$ROOTPATH/g, TESTING? this.rootPath: "/box")
       .replace(/\$SOURCEFILE/g, this.sourceFile);
   }

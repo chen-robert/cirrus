@@ -49,7 +49,7 @@ router.post("/", (req, res) => {
                 });
               })
             } else {
-              const inputFileName = name.config.inExt;
+              const inputFileName = name + config.inExt;
 
               fs.copyFileSync(inputFile, `${box.rootPath}/${inputFileName}`);
               box.run(inputFileName, {}, (err, stdout, stderr) => {

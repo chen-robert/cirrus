@@ -11,7 +11,7 @@ const getTestDir = group => `${testsPath}/${group}`;
 
 const getGraderDir = name => `${graderPath}/${name}`;
 
-const loadTestcases = (testsuite, tests, cb) => {
+const loadTestcases = (testsuite, tests) => {
   const testsuiteDir = getTestDir(testsuite);
   fs.readdir(testsuiteDir, (err, files) => {
     if(err) return cb(err);

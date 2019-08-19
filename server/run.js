@@ -19,85 +19,74 @@ const apiSchema = Joi.object().keys({
   testsuite: Joi.string().alphanum().max(30).default(config.defaultTestsuite),
   tests: Joi.array(),
   
-  compile: isolateSchema,
-  execute: isolateSchema,
+  compileOpts: isolateSchema,
+  executeOpts: isolateSchema,
 });
 
-router.post("/", (req, res) => {
-  apiSchema.validate(req.body, (err, data) => {
-    if (err) return joiError(res, err);
+router.post("/", async (req, res) => {
+  const data = await apiSchema.validate(req.body)
+    .catch(err => joiError(res, err));
 
-    const {lang, source, filename, testsuite, grader, tests} = data;
-    const box = new Isolate(lang);
+  if(!data) return;
+    
+  const {lang, source, filename, testsuite, grader, tests, compileOpts, executeOpts} = data;
+  const box = new Isolate(lang);
 
-    const runAllTests = () => {
-      loadTestcases(testsuite, tests, async (err, testcases) => {
-        if(err) return res.status(400).send(`Invalid testsuite: ${testsuite}`);
-
-        const runTest = name => {
-          return new Promise(resolve => {
-            const testsuiteDir = getTestDir(testsuite);
-            const inputFile = `${testsuiteDir}/${name + config.inExt}`;
-            const outputFile = `${testsuiteDir}/${name + config.outExt}`;
-            if(grader) {
-              box.runGrader(inputFile, outputFile, grader, {}, (err, status) => {
-                if(status) status = status.trim();
-                resolve({
-                  name,
-                  status,
-                  err
-                });
-              })
-            } else {
-              const inputFileName = name + config.inExt;
-
-              fs.copyFileSync(inputFile, `${box.rootPath}/${inputFileName}`);
-              box.run(inputFileName, {}, (err, stdout, stderr) => {
-                resolve({
-                  name,
-                  err,
-                  stdout,
-                  stderr
-                });
-              });
-            }
-          });
-        }
-
-        if(config.runTestsAsync) {
-          Promise
-            .all(testcases.map(runTest))
-            .then(results => {
-              box.destroy();
-              res.send(results);
-            });
-        } else {
-          const results = [];
-          for(let i = 0; i < testcases.length; i++){
-            const val = await runTest(testcases[i]);
-            results.push(val);
-          }
-
-          box.destroy();
-          res.send(results);
-        }
-
-      });
-    }
+  loadTestcases(testsuite, tests, async (err, testcases) => {
+    if(err) return res.status(400).send({
+      err: `Invalid testsuite: ${testsuite}`
+    });
 
     fs.writeFileSync(`${box.rootPath}/${filename}`, source);
-    box.compile(filename, {}, (err, stdout, stderr) => {
-      if(err) {
-        return res.send({
+    await box.compile(filename, compileOpts)
+      .catch(({stdout, stderr}) => {
+        res.send({
           err: "Compilation error",
           stderr: stderr,
           stdout: stdout
         });
+      });
+
+    const runTest = async name => {
+      const ret = {name};
+
+      const testsuiteDir = getTestDir(testsuite);
+      const inputFile = `${testsuiteDir}/${name + config.inExt}`;
+      const outputFile = `${testsuiteDir}/${name + config.outExt}`;
+      
+      if(grader) {
+        let {err, status} = await box.runGrader(inputFile, outputFile, grader, executeOpts);
+        if(status) status = status.trim();
+        
+        Object.assign(ret, {
+          status,
+          err
+        });
+      } else {
+        const inputFileName = name + config.inExt;
+
+        fs.copyFileSync(inputFile, `${box.rootPath}/${inputFileName}`);
+        const {err, stdout, stderr} = await box.run(inputFileName, executeOpts);
+        
+        Object.assign(ret, {
+          err,
+          stdout,
+          stderr
+        });
       }
 
-      runAllTests();
-    });      
-  });
+      return ret;
+    }
+
+    const results = [];
+    for(let i = 0; i < testcases.length; i++){
+      const val = await runTest(testcases[i]);
+      results.push(val);
+    }
+
+    box.destroy();
+    res.send(results);
+  });  
 });
 
 module.exports = router;

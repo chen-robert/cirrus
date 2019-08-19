@@ -87,4 +87,57 @@ describe("Compilation and Execution", () => {
       });
     });
   });
+
+  if(langs.length !== 0){
+    const testLang = langs[0];
+    const testFile = config.langs[testLang].test;
+
+    const standardErrorHandler = done => (err, res) => {
+      res.should.have.status(400);
+      res.body.should.be.an("object");
+      res.body.err.should.be.a("string");
+
+      done();
+    }
+
+    const apiTemplate = ({lang, filename, source, tests, grader}) => {
+      return {
+        lang: lang || testLang,
+        filename: filename || testFile,
+        source: source || fs.readFileSync(`${codePath}/${testFile}`).toString(),
+        testsuite: tests || testsuite,
+        grader: grader || "default"
+      }
+    }
+
+    describe("Error handling", () => {
+      it("it should error on nonexistent test suite", done => {
+        chai.request(server)
+          .post("/run")
+          .send(apiTemplate({tests: "notarealtestsuite"}))
+          .end(standardErrorHandler(done));
+      });
+
+      it("it should error on nonexistent grader", done => {
+        chai.request(server)
+          .post("/run")
+          .send(apiTemplate({grader: "notarealgrader"}))
+          .end(standardErrorHandler(done));
+      });
+
+      it("it should error on nonexistent lang", done => {
+        chai.request(server)
+          .post("/run")
+          .send(apiTemplate({lang: "notareallang"}))
+          .end(standardErrorHandler(done));
+      });
+
+      it("it should error on invalid filename", done => {
+        chai.request(server)
+          .post("/run")
+          .send(apiTemplate({lang: "invalid../filename"}))
+          .end(standardErrorHandler(done));
+      });
+    });
+  }
 });

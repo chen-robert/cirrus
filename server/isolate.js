@@ -52,7 +52,7 @@ class Isolate {
       time: Joi.number().min(0).integer(),
       wallTime: Joi.number().min(0).integer(),
       mem: Joi.number().min(0).integer(),
-    }).unknown(false);
+    });
   }
 
   constructor(lang){
@@ -104,23 +104,28 @@ class Isolate {
     return cmd;
   }
 
-  compile(source, opts, cb) {
-    if(!this.config.compile) {
-      this.compiledFile = source;
-      return cb();
-    }
-    
-    this.name = source.split(".")[0];
-    this.sourceFile = source;
-    this.compiledFile = this.parseSpecial(this.config.out); 
-
-    opts = Object.assign(compileDefaults, opts);
-    let cmd = this.getCommandBase(opts);
-
-    if(TESTING) cmd = `cd ${this.rootPath} &&`;
-    cmd = `${cmd} ${this.getFullCmd(this.config.compile)}`;
-
-    exec(cmd, cb);
+  compile(source, opts) {
+    return new Promise((resolve, reject) => {
+      if(!this.config.compile) {
+        this.compiledFile = source;
+        return resolve();
+      }
+      
+      this.name = source.split(".")[0];
+      this.sourceFile = source;
+      this.compiledFile = this.parseSpecial(this.config.out); 
+  
+      opts = Object.assign(compileDefaults, opts);
+      let cmd = this.getCommandBase(opts);
+  
+      if(TESTING) cmd = `cd ${this.rootPath} &&`;
+      cmd = `${cmd} ${this.getFullCmd(this.config.compile)}`;
+  
+      exec(cmd, (err, stdout, stderr) => {
+        if(err) return reject({stdout, stderr});
+        return resolve();
+      });
+    })
   }
 
   parseSpecial(name) {
@@ -141,13 +146,15 @@ class Isolate {
     return ret;
   }
 
-  run(inFile, opts, cb) {
-    opts = Object.assign(runDefaults, opts, {inFile});
-    let cmd = this.runCmd(opts);
-
-    if(TESTING) cmd = `cat ${this.rootPath}/${inFile} | ${cmd}`;
-
-    exec(cmd, cb);
+  run(inFile, opts) {
+    return new Promise(resolve => {
+      opts = Object.assign(runDefaults, opts, {inFile});
+      let cmd = this.runCmd(opts);
+  
+      if(TESTING) cmd = `cat ${this.rootPath}/${inFile} | ${cmd}`;
+  
+      exec(cmd, (err, stdout, stderr) => resolve({err, stdout, stderr}));
+    })
   }
 
   runCmd(opts) {
@@ -160,33 +167,35 @@ class Isolate {
     return cmd;
   }
 
-  runGrader(inFile, outFile, grader, opts, cb) {
-    const graderDir = getGraderDir(grader);
-
-    const graderConfig = require(`${graderDir}/config.json`);
-    const {cmd, args} = graderConfig;
-
-    const graderProcess = spawn(cmd, args || [], {
-      cwd: graderDir,
-      env: {
-        "INPUT_PATH": inFile,
-        "ANSWER_PATH": outFile,
-        "RUN_CMD": this.runCmd(opts)
-      }
-    });
-
-    let stdout = "";
-    let stderr = "";
-    graderProcess.stdout.on("data", data => stdout += data);
-    graderProcess.stderr.on("data", data => stderr += data);
-
-    graderProcess.on("close", code => {
-      if(code != 0) {
-        console.log(`Grader exited with error code: ${code}`);
-        console.log(`Stderr: ${stderr}`);
-        return cb(`Grader exited with code ${code}`);
-      }
-      return cb(null, stdout);
+  runGrader(inFile, outFile, grader, opts) {
+    return new Promise(resolve => {
+      const graderDir = getGraderDir(grader);
+  
+      const graderConfig = require(`${graderDir}/config.json`);
+      const {cmd, args} = graderConfig;
+  
+      const graderProcess = spawn(cmd, args || [], {
+        cwd: graderDir,
+        env: {
+          "INPUT_PATH": inFile,
+          "ANSWER_PATH": outFile,
+          "RUN_CMD": this.runCmd(opts)
+        }
+      });
+  
+      let stdout = "";
+      let stderr = "";
+      graderProcess.stdout.on("data", data => stdout += data);
+      graderProcess.stderr.on("data", data => stderr += data);
+  
+      graderProcess.on("close", code => {
+        if(code != 0) {
+          console.log(`Grader exited with error code: ${code}`);
+          console.log(`Stderr: ${stderr}`);
+          return resolve({err: `Grader error. Exited with code ${code}`});
+        }
+        return resolve({status: stdout});
+      });
     });
   }
 

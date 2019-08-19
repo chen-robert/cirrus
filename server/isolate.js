@@ -4,7 +4,7 @@ const path = require("path");
 
 const { exec, execSync, spawn } = require('child_process');
 const config = require(__rootdir + "/config.json");
-const {compileDefaults, executeDefaults} = config;
+const {compileDefaults, executeDefaults} = config.isolate;
 const {getGraderDir, which} = require(__rootdir + "/server/util.js");
 
 const TESTING = process.env.TESTING !== undefined;

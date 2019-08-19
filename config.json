@@ -47,15 +47,17 @@
   "graderDir": "graders",
   "graders": ["default", "strict"],
   "defaultTestsuite": "global",
-  "compileDefaults": {
-    "time": 1,
-    "wallTime": 10,
-    "mem": 10000
-  },
-  "executeDefaults": {
-    "time": 4,
-    "wallTime": 40,
-    "mem": 100000
+  "isolate": {
+    "compileDefaults": {
+      "time": 1,
+      "wallTime": 10,
+      "mem": 10000
+    },
+    "executeDefaults": {
+      "time": 4,
+      "wallTime": 40,
+      "mem": 100000
+    }
   }
 
 }

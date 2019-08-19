@@ -144,7 +144,7 @@ class Isolate {
     opts = Object.assign(runDefaults, opts, {inFile});
     let cmd = this.runCmd(opts);
 
-    if(TESTING) cmd = `cat ${inFile} | ${cmd}`;
+    if(TESTING) cmd = `cat ${this.rootPath}/${inFile} | ${cmd}`;
 
     exec(cmd, cb);
   }

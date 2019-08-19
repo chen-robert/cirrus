@@ -33,7 +33,7 @@ router.post("/", (req, res) => {
     const runAllTests = () => {
       loadTestcases(testsuite, tests, async (err, testcases) => {
         if(err) return res.status(400).send(`Invalid testsuite: ${testsuite}`);
-        
+
         const runTest = name => {
           return new Promise(resolve => {
             const testsuiteDir = getTestDir(testsuite);
@@ -49,7 +49,10 @@ router.post("/", (req, res) => {
                 });
               })
             } else {
-              box.run(inputFile, {}, (err, stdout, stderr) => {
+              const inputFileName = name.config.inExt;
+
+              fs.copyFileSync(inputFile, `${box.rootPath}/${inputFileName}`);
+              box.run(inputFileName, {}, (err, stdout, stderr) => {
                 resolve({
                   name,
                   err,

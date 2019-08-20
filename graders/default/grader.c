@@ -3,6 +3,7 @@
 #include <string.h>
 
 void trim();
+char* getConcatString();
 
 int main(void)
 {
@@ -25,26 +26,18 @@ int main(void)
     return 2;
   }
 
-  char buf[1024];
-
-  FILE *fp = popen(runCmd, "r+");
-  while (fgets(buf, 1023, inFile) != NULL)
-  {
-    fprintf(fp, "%s", buf);
-  }
-
-  if (fp == NULL)
-  {
+  FILE *fp = popen(getConcatString(runCmd, getConcatString(" < ", inPath)), "r");
+  if(fp == NULL) {
     puts("RTE");
     return 0;
   }
-
+  
   char* line = NULL;
   char* line2 = NULL;
   size_t len = 0;
   while (getline(&line, &len, fp) != -1) {
     trim(line);
-
+    
     if(getline(&line2, &len, ansFile) == -1) {
       if(strlen(line) == 0) {
         break;
@@ -53,9 +46,7 @@ int main(void)
         return 0;
       }
     }
-
     trim(line2);
-
     if (strcmp(line, line2) != 0) {
       puts("WA");
       return 0;
@@ -88,3 +79,22 @@ void trim(char* str) {
 
   str[i+1] = '\0';
 }
+
+char * getConcatString( const char *str1, const char *str2 ) 
+{
+    char *finalString = NULL;
+        size_t n = 0;
+
+            if ( str1 ) n += strlen( str1 );
+                if ( str2 ) n += strlen( str2 );
+
+                    if ( ( str1 || str2 ) && ( finalString = malloc( n + 1 ) ) != NULL )
+                        {
+                                *finalString = '\0';
+
+                                        if ( str1 ) strcpy( finalString, str1 );
+                                                if ( str2 ) strcat( finalString, str2 );
+                                                    }
+
+                                                        return finalString;
+                                                        }

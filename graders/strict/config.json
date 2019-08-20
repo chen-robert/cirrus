@@ -1,5 +1,5 @@
 {
-  "prepare": "gcc -std=c11 -Wall -Wextra -O3 grader.c -o grader.o",
+  "prepare": "gcc -std=gnu11 -Wall -Wextra -O3 grader.c -o grader.o",
   "cmd": "./grader.o",
   "args": []
 }

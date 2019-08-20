@@ -49,9 +49,9 @@
   "defaultTestsuite": "global",
   "isolate": {
     "compileDefaults": {
-      "time": 1,
+      "time": 10,
       "wallTime": 10,
-      "mem": 10000
+      "mem": 100000
     },
     "executeDefaults": {
       "time": 4,

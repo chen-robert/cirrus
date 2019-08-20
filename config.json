@@ -36,7 +36,7 @@
     "python3": {
       "run": {
         "cmd": "python3",
-        "opts": ["$OUTFILE"]
+        "opts": ["-S", "$OUTFILE"]
       },
       "test": "sample3.py"
     }

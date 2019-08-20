@@ -39,7 +39,8 @@ const which = binary => {
 
   which.memo[binary] = dirs
     .map(dir => `${dir}/${binary}`)
-    .filter(dir => fs.existsSync(dir))[0] || binary;
+    .filter(dir => fs.existsSync(dir))
+    .map(path => fs.realpathSync(path))[0] || binary;
 
   return which.memo[binary];
 }

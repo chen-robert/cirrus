@@ -134,7 +134,7 @@ class Isolate {
 
   run(inFile, opts) {
     return new Promise(resolve => {
-      opts = Object.assign(executeDefaults, opts, {inFile});
+      opts = Object.assign({}, executeDefaults, opts, {inFile});
       let cmd = this.runCmd(opts);
   
       if(TESTING) cmd = `cat ${this.rootPath}/${inFile} | ${cmd}`;
@@ -155,6 +155,7 @@ class Isolate {
 
   runGrader(inFile, outFile, grader, opts) {
     return new Promise(resolve => {
+      opts = Object.assign({}, executeDefaults, opts);
       const graderDir = getGraderDir(grader);
   
       const graderConfig = require(`${graderDir}/config.json`);

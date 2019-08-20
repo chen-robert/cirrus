@@ -46,6 +46,7 @@ router.post("/", async (req, res) => {
     });
   if(!testcases) return;
 
+  let err = false;
   fs.writeFileSync(`${box.rootPath}/${filename}`, source);
   await box.compile(filename, compileOpts)
     .catch(({stdout, stderr}) => {
@@ -54,7 +55,9 @@ router.post("/", async (req, res) => {
         stderr: stderr,
         stdout: stdout
       });
+      err = true;
     });
+  if(err) return;
 
   const runTest = async name => {
     const ret = {name};

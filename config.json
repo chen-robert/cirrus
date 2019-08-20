@@ -39,6 +39,13 @@
         "opts": ["-S", "$OUTFILE"]
       },
       "test": "sample3.py"
+    },
+    "python2": {
+      "run": {
+        "cmd": "python2",
+        "opts": ["-S", "$OUTFILE"]
+      },
+      "test": "sample2.py"
     }
   },
   "inExt": ".in",

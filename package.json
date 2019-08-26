@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha",
     "langs": "mocha test/run.js",
+    "start": "node index.js",
     "dev": "nodemon -e js,json --watch index.js --watch server --watch graders index.js"
   },
   "repository": {

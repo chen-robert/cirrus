@@ -13,10 +13,10 @@ const isolateSchema = Isolate.schema;
 const apiSchema = Joi.object().keys({
   lang: Joi.string().valid(Isolate.langs).required(),
   source: Joi.string().required(),
-  filename: Joi.string().regex(/^[a-zA-Z0-9\.]*$/).max(30).required(),
+  filename: Joi.string().regex(/^[a-zA-Z0-9_\.]*$/).max(30).required(),
 
   grader: Joi.string().valid(config.graders),
-  testsuite: Joi.string().alphanum().max(30).default(config.defaultTestsuite),
+  testsuite: Joi.string().regex(/^[a-zA-Z0-9_]*$/).max(30).default(config.defaultTestsuite),
   tests: Joi.array(),
   
   compileOpts: isolateSchema,
@@ -51,9 +51,11 @@ router.post("/", async (req, res) => {
   await box.compile(filename, compileOpts)
     .catch(({stdout, stderr}) => {
       res.send({
-        err: "Compilation error",
-        stderr: stderr,
-        stdout: stdout
+        compile: {
+          err: "Compilation error",
+          stderr: stderr,
+          stdout: stdout
+        }
       });
       err = true;
     });
@@ -96,7 +98,9 @@ router.post("/", async (req, res) => {
   }
 
   box.destroy();
-  res.send(results);
+  res.send({
+    tests: results
+  });
 });
 
 module.exports = router;

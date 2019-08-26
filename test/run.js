@@ -48,9 +48,10 @@ describe("Compilation and Execution", () => {
           })
           .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.be.an("array");
+            res.body.should.be.an("object");
+            res.body.tests.should.be.an("array");
 
-            res.body.forEach(result => {
+            res.body.tests.forEach(result => {
               result.name.should.be.a("string");
               result.stderr.should.be.a("string");
               result.stdout.should.be.a("string");
@@ -73,9 +74,11 @@ describe("Compilation and Execution", () => {
             grader: "default"
           })
           .end((err, res) => {
-            res.body.should.be.an("array");
+            res.should.have.status(200);
+            res.body.should.be.an("object");
+            res.body.tests.should.be.an("array");
 
-            res.body.forEach(result => {
+            res.body.tests.forEach(result => {
               result.name.should.be.a("string");
               result.status.should.equal("AC");
               

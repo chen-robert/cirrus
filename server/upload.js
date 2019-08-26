@@ -9,8 +9,8 @@ const {getPath, getTestDir, joiError} = require(__rootdir + "/server/util.js");
 fs.mkdirSync(getTestDir(config.defaultTestsuite), {recursive: true});
 
 const apiSchema = Joi.object().keys({
-  name: Joi.string().regex(/^[a-zA-Z0-9\.]*$/).max(30).required(),
-  testsuite: Joi.string().alphanum().max(30).default(config.defaultTestsuite)
+  name: Joi.string().regex(/^[a-zA-Z0-9_\.]*$/).max(30).required(),
+  testsuite: Joi.string().regex(/^[a-zA-Z0-9_]*$/).max(30).default(config.defaultTestsuite)
 });
 
 const upload = require("multer")({

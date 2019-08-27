@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { execSync } = require('child_process');
+const { exec } = require('child_process');
 
 const config = require(__rootdir + "/config.json");
 
@@ -60,14 +60,15 @@ const prepareGraders = () => {
   
     if(!config.prepare) return;
   
-    try{
-      execSync(config.prepare, {
-        cwd: graderDir
-      });
-    } catch (e) {
-      console.error(`Command failed: ${config.prepare}`);
-      console.error(`Failed to prepare grader in ${graderDir}`);
-    }
+    exec(config.prepare, {
+      cwd: graderDir
+    }, (err, stdout, stderr) => {
+      if(err) {
+        console.error(`Command failed: ${config.prepare}`);
+        console.error(`Failed to prepare grader in ${graderDir}`);
+      }
+      console.log(`${graderDir} preparation output: ${stdout} | ${stderr}`)
+    });
   });
 }
 

@@ -24,7 +24,7 @@ router.post("/",
   (req, res, next) => {
     upload.single("file")(req, res, err => {
       if (err) {
-        req.status(400).send({
+        res.status(400).send({
           err: "File too big"
         });
       }

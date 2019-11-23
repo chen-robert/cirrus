@@ -13,8 +13,8 @@
     },
     "c++17": {
       "compile": {
-        "cmd": "gcc",
-        "opts": ["-std=c++17", "-Wall", "-Wextra", "-O3", "-o", "a.o", "$SOURCEFILE", "-lstdc++"]
+        "cmd": "g++",
+        "opts": ["-std=c++17", "-Wall", "-Wextra", "-O3", "-o", "a.o", "$SOURCEFILE"]
       },
       "run": {
         "cmd": "$OUTFILE"
